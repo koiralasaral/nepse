@@ -1,0 +1,8 @@
+a = 1
+while a < 10:
+    print("Namaste!")
+    a += 1
+# for loop
+countries = ["Nepal", "Bangladesh", "Maldives"]
+for country in countries:
+    print(country)

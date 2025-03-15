@@ -1,0 +1,19 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as stats
+
+# Define the parameter λ
+λ = 25
+
+# Define the range of x values
+x = np.arange(0, 60)
+
+# Calculate the Poisson probabilities
+poisson_pmf = stats.poisson.pmf(x, λ)
+
+# Plot the Poisson distribution
+plt.stem(x, poisson_pmf)
+plt.xlabel('Number of events')
+plt.ylabel('Probability')
+plt.title(f'Poisson Distribution (λ={λ})')
+plt.show()

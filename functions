@@ -1,0 +1,6 @@
+# function
+# create function
+# syntax
+def welcome():
+    print("Hello, Namaste!")
+welcome()
