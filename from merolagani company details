@@ -1,0 +1,81 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+
+# Function to get all company symbols from Merolagani
+def get_all_symbols(url):
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Failed to fetch the page: {url}")
+        return []
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find all symbols (modify the selector based on the website structure)
+    symbols = []
+    table = soup.find('table', class_='table')  # Adjust class name if needed
+    if table:
+        rows = table.find_all('tr')
+        for row in rows[1:]:  # Skip the header row
+            cols = row.find_all('td')
+            if cols:
+                symbol = cols[0].text.strip()  # Assuming the first column contains the symbol
+                symbols.append(symbol)
+    return symbols
+
+# Function to fetch company details for a given symbol
+def get_company_details(symbol):
+    detail_url = f"https://merolagani.com/CompanyDetail.aspx?symbol={symbol}"
+    try:
+        response = requests.get(detail_url, timeout=10)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching details for {symbol}: {e}")
+        return None
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Extract company details (modify selectors based on the website structure)
+    details = {'Symbol': symbol}  # Add Symbol as a key to identify the company
+    table = soup.find('table', class_='table')  # Adjust class name if needed
+    if table:
+        rows = table.find_all('tr')
+        for row in rows:
+            cols = row.find_all('td')
+            if len(cols) == 2:  # Assuming key-value pairs
+                key = cols[0].text.strip()
+                value = cols[1].text.strip()
+                details[key] = value
+    return details
+
+# URL for the page listing all companies
+symbols_url = "https://merolagani.com/LatestMarket.aspx"
+
+# Get all stock symbols
+symbols = get_all_symbols(symbols_url)
+print(f"Found {len(symbols)} symbols.")
+
+# Fetch details for each symbol and store in a list
+company_details_list = []
+for i, symbol in enumerate(symbols):
+    print(f"Processing {i+1}/{len(symbols)}: {symbol}")
+    details = get_company_details(symbol)
+    if details:
+        company_details_list.append(details)
+    time.sleep(2)  # Add delay to avoid overwhelming the server
+
+# Convert the list of dictionaries to a DataFrame
+df = pd.DataFrame(company_details_list)
+
+# Save to CSV
+csv_file = 'company_details.csv'
+df.to_csv(csv_file, index=False, encoding='utf-8-sig')
+print(f"Data saved to {csv_file}.")
+# Open the CSV file to check the results
+import os
+os.startfile(csv_file)  # This will open the CSV file in the default application
+# Note: The above code assumes that the structure of the website remains consistent.
+with open(csv_file, 'r', encoding='utf-8-sig') as file:
+    content = file.read()
+    print(content)  # Print the content of the CSV file 

@@ -1,0 +1,16 @@
+// Habit Formation
+digraph {
+	S [label=Stimulus]
+	D [label="Decision Point"]
+	G [label="Goal-Directed
+(Prefrontal Cortex)"]
+	H [label="Habitual
+(Dorsolateral Striatum)"]
+	O1 [label="Outcome Eval"]
+	O2 [label="Automated Response"]
+	S -> D
+	D -> G [label="if deliberative"]
+	D -> H [label="if routine"]
+	G -> O1
+	H -> O2
+}
